@@ -1,0 +1,95 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+// A linha 'apply plugin: 'kotlin-android-extensions'' foi removida porque está obsoleta e causa problemas.
+// Se seu projeto usava kotlin-android-extensions para acessar views, o View Binding abaixo o substituirá.
+
+android {
+    // compileSdk deve ser uma versão recente. 34 é uma boa opção.
+    // Certifique-se de que você tem o SDK 34 (ou superior) instalado no Android Studio.
+    compileSdk 34 // ATUALIZADO de 29
+
+    // buildToolsVersion não é mais necessário com AGP mais recentes, será inferido automaticamente.
+    // buildToolsVersion "29.0.3" // <--- REMOVIDO!
+
+    defaultConfig {
+        applicationId "com.example.imc" // Confirmado como o pacote correto do seu AndroidManifest.xml
+        minSdkVersion 23 // Mantido para compatibilidade, mas pode ser atualizado para 24 ou 26
+        targetSdkVersion 34 // ATUALIZADO de 29. Deve corresponder ao compileSdk.
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // Estas opções garantem compatibilidade com Java 8 e Kotlin JVM.
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    // O namespace é OBRIGATÓRIO a partir do Android Gradle Plugin 8.0.
+    namespace 'com.example.imc' // ISTO É CRÍTICO! Use o mesmo valor do applicationId.
+
+    // Configuração de sourceSets para indicar onde estão os arquivos Java/Kotlin.
+    // Ajustado para focar em Java para os testes, já que seus arquivos de teste são Java.
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/main/kotlin']
+            res.srcDirs = ['src/main/res']
+            assets.srcDirs = ['src/main/assets']
+        }
+        androidTest {
+            java.srcDirs = ['src/androidTest/java'] // Foca apenas em Java para testes instrumentados
+        }
+        test {
+            java.srcDirs = ['src/test/java'] // Foca apenas em Java para testes unitários
+        }
+    }
+
+    // Habilita opções de teste necessárias para o ambiente moderno.
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
+
+    // Habilita o View Binding, a alternativa moderna para kotlin-android-extensions.
+    buildFeatures {
+        viewBinding = true
+    }
+
+    // Opções de empacotamento para evitar conflitos de recursos.
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Atualizado para usar a versão do Kotlin definida no build.gradle de nível de projeto.
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version" // ATUALIZADO de kotlin-stdlib-jdk7
+
+    // Dependências ATUALIZADAS para versões compatíveis com AGP 8.1.0 e Kotlin 1.9.0.
+    implementation 'androidx.appcompat:appcompat:1.6.1' // ATUALIZADO de 1.1.0
+    implementation 'androidx.core:core-ktx:1.12.0'     // ATUALIZADO de 1.2.0
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4' // ATUALIZADO de 1.1.3
+    implementation 'com.google.android.material:material:1.11.0' // ATUALIZADO de 1.1.0
+
+    // Dependências de teste também ATUALIZADAS.
+    testImplementation 'junit:junit:4.13.2'             // ATUALIZADO de 4.12
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5' // ATUALIZADO de 1.1.1
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1' // ATUALIZADO de 3.2.0
+}
